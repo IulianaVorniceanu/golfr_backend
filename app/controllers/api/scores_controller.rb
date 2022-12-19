@@ -16,7 +16,7 @@ module Api
     end
 
     def user_score
-      user = User.find_by(name: params[:username])
+      user = User.find_by(id: params[:id])
       scores = user.scores
       serialized_scores = scores.map(&:serialize)
 
