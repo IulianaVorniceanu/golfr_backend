@@ -5,11 +5,26 @@ module Api
     before_action :validate_score_user_id, only: :destroy
 
     def user_feed
-      scores = Score.all.order(played_at: :desc, id: :desc).includes(:user)
+      scores = Score.all.order(played_at: :desc, id: :desc).includes(:user).limit(25)
       serialized_scores = scores.map(&:serialize)
 
       response = {
         scores: serialized_scores,
+      }
+
+      render json: response.to_json
+    end
+
+    def user_score
+      user = User.find_by(id: params[:id])
+      scores = user.scores
+      serialized_scores = scores.map(&:serialize)
+
+      response = {
+        player: {
+          playerName: user.name,
+          scores: serialized_scores,
+        }
       }
 
       render json: response.to_json
@@ -40,7 +55,7 @@ module Api
     private
 
     def score_params
-      params.require(:score).permit(:total_score, :played_at)
+      params.require(:score).permit(:total_score, :played_at, :number_of_holes)
     end
 
     def validate_score_user_id
